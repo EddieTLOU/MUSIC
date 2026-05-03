@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUSIC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Schoolbell&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon: #ff0000;
+            --black: #000000;
+        }
+
+        html, body {
+            background-color: var(--black) !important;
+            color: var(--neon);
+            font-family: 'Schoolbell', cursive;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Scanline Overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+            background-size: 100% 4px;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(0); }
+            25% { transform: translate(-2px, 2px); }
+            75% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        .container { 
+            background-color: var(--black);
+            text-align: center; 
+            width: 100%;
+            max-width: 800px;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .page { display: none; width: 100%; }
+        .active { display: flex; flex-direction: column; align-items: center; }
+
+        h1 { 
+            font-size: clamp(3.5rem, 12vw, 6.5rem);
+            text-shadow: 0 0 20px var(--neon);
+            animation: shake 0.4s infinite;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+        
+        .menu-btn {
+            background: var(--black);
+            border: 5px solid var(--neon);
+            color: var(--neon);
+            padding: clamp(15px, 4vw, 25px);
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-family: 'Schoolbell', cursive;
+            cursor: pointer;
+            margin: 15px;
+            width: 90%;
+            max-width: 550px;
+            box-shadow: 10px 10px 0px #4a0000;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.1s;
+        }
+
+        @media (hover: hover) {
+            .menu-btn:hover {
+                transform: scale(1.05);
+                box-shadow: 15px 15px 0px var(--neon);
+                background: #110000;
+            }
+        }
+
+        .menu-btn:active {
+            transform: scale(0.95);
+            background: var(--neon);
+            color: var(--black);
+        }
+
+        .sub-text { font-size: 1.3rem; display: block; color: #880000; margin-top: 5px; }
+
+        .back-nav {
+            background: none; border: none; color: var(--neon);
+            cursor: pointer; font-family: 'Schoolbell', cursive;
+            font-size: 1.6rem; margin-top: 30px; text-decoration: underline;
+            z-index: 110;
+        }
+
+        /* PLAYER */
+        #player { 
+            background: var(--black); 
+            position: fixed; top: 0; left: 0; 
+            z-index: 50; width: 100vw; height: 100vh;
+        }
+
+        .big-btn {
+            background: none; border: none; cursor: pointer;
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+
+        /* AUTO-SQUARE CROP */
+        .cover-wrapper {
+            width: 85vw;
+            height: 85vw;
+            max-width: 500px;
+            max-height: 500px;
+            border: 6px solid var(--neon);
+            overflow: hidden;
+            filter: drop-shadow(0 0 30px var(--neon));
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cover-wrapper img.cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pause-img {
+            position: absolute;
+            width: clamp(80px, 25vw, 150px);
+            height: auto;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 60;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .paused .pause-img { opacity: 1; }
+        .paused .cover-wrapper img.cover { filter: brightness(0.2) grayscale(1); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- HOME -->
+    <div id="home" class="page active">
+        <h1>MUSIC</h1>
+        <button class="menu-btn" onclick="goTo('artists')">PLAY MUSIC</button>
+    </div>
+
+    <!-- ARTISTS -->
+    <div id="artists" class="page">
+        <h1>ARTISTS</h1>
+        <button class="menu-btn" onclick="goTo('gorillaz')">GORILLAZ</button>
+        <button class="menu-btn" onclick="goTo('michaeljackson')">MICHAEL JACKSON</button>
+        <button class="menu-btn" style="border-color:#220000; color:#220000; cursor:default; box-shadow:none;">MORE COMING...</button>
+        <button class="back-nav" onclick="goTo('home')">[ BACK TO HOME ]</button>
+    </div>
+
+    <!-- GORILLAZ TRACKS -->
+    <div id="gorillaz" class="page">
+        <h1>GORILLAZ</h1>
+        <button class="menu-btn" onclick="setTrack('orangecounty')">
+            ORANGE COUNTY
+            <span class="sub-text">Album: The Mountain</span>
+        </button>
+        <button class="menu-btn" onclick="setTrack('feelgood')">
+            FEEL GOOD INC
+            <span class="sub-text">Album: Demon Days</span>
+        </button>
+        <button class="menu-btn" onclick="setTrack('clint')">
+            CLINT EASTWOOD
+            <span class="sub-text">Album: Gorillaz</span>
+        </button>
+        <button class="back-nav" onclick="goTo('artists')">[ BACK TO ARTISTS ]</button>
+    </div>
+
+    <!-- MICHAEL JACKSON TRACKS -->
+    <div id="michaeljackson" class="page">
+        <h1>MICHAEL JACKSON</h1>
+        <button class="menu-btn" onclick="setTrack('billiejean')">
+            BILLIE JEAN
+        </button>
+        <button class="back-nav" onclick="goTo('artists')">[ BACK TO ARTISTS ]</button>
+    </div>
+
+    <!-- PLAYER -->
+    <div id="player" class="page">
+        <div id="p-wrap" class="big-btn" onclick="togglePlay()">
+            <div class="cover-wrapper">
+                <img id="dynamic-img" class="cover" src="" alt="ART">
+                <img src="pause.png" class="pause-img" alt="PAUSE">
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let audio = null;
+    let trackPath = "";
+
+    function goTo(id) {
+        if (['home', 'artists', 'gorillaz', 'michaeljackson'].includes(id)) {
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+                audio = null;
+            }
+        }
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function setTrack(slug) {
+        window.location.hash = slug;
+        loadTrack();
+    }
+
+    function loadTrack() {
+        const hash = window.location.hash.replace('#', '');
+        
+        if (!hash) { goTo('home'); return; }
+        if (['artists', 'gorillaz', 'michaeljackson'].includes(hash)) { goTo(hash); return; }
+
+        trackPath = hash + '.mp3';
+        document.getElementById('dynamic-img').src = hash + '.png';
+        
+        if (audio) { audio.pause(); audio = null; }
+        document.getElementById('p-wrap').classList.remove('paused');
+        goTo('player');
+    }
+
+    function togglePlay() {
+        if (!audio) { audio = new Audio(trackPath); }
+        const wrap = document.getElementById('p-wrap');
+
+        if (audio.paused) {
+            audio.play();
+            wrap.classList.remove('paused');
+        } else {
+            audio.pause();
+            wrap.classList.add('paused');
+        }
+    }
+
+    window.onhashchange = loadTrack;
+    window.onload = loadTrack;
+</script>
+
+</body>
+</html>
